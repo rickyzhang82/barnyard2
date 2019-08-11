@@ -429,6 +429,17 @@ AC_DEFUN([FAIL_MESSAGE],[
    exit 1
 ])
 
+# any armv6 or armv7  platform has to disable optimization
+# to avoid unaligned memory access
+AC_MSG_CHECKING(for arm avoid bus error)
+if eval "echo $host_cpu|grep -i 'armv[[6|7]]' >/dev/null"; then
+    AC_MSG_RESULT(yes)
+    NO_OPTIMIZE="yes"
+    CFLAGS="$CFLAGS -mno-unaligned-access "
+else
+    AC_MSG_RESULT(no)
+fi
+
 # any sparc platform has to have this one defined.
 AC_MSG_CHECKING(for sparc)
 if eval "echo $host_cpu|grep -i sparc >/dev/null"; then
@@ -1096,7 +1107,7 @@ fi
 
 # Set to no optimization regardless of what user or autostuff set
 if test "x$NO_OPTIMIZE" = "xyes"; then
-    CFLAGS=`echo $CFLAGS | sed -e "s/-O./-O0/"`
+    CFLAGS=`echo $CFLAGS | sed -e "s/-O./-O0 /"`
 
     # in case user override doesn't include -O
     if echo $CFLAGS | grep -qve -O0 ; then
